@@ -2,6 +2,21 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# 실행 방법
+
+```bash
+npm install
+cd node_modules
+cd @solyd
+cd lib-jitsi-meet
+npm install
+cd ..
+cd ..
+cd ..
+npm run start
+```
+
+
 ## Available Scripts
 
 In the project directory, you can run:

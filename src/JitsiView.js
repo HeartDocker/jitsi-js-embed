@@ -10,9 +10,11 @@ var connection = null;
 const JitsiView = () => {
     useEffect(() => {
         JitsiMeetJS.init(initOptions);
+
         connection = new JitsiMeetJS.JitsiConnection(null, null, {
             disableAudioLevels: true,
         });
+        console.log(connection);
     })
     return (
         <div>
@@ -20,3 +22,5 @@ const JitsiView = () => {
         </div>
     )
 }
+
+export default JitsiView;
