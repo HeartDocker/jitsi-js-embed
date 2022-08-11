@@ -1,5 +1,10 @@
 import React, { createRef, useRef, useState, useEffect } from 'react';
-import JitsiMeetJS from '@solyd/lib-jitsi-meet';
+// import JitsiMeetJS from '@solyd/lib-jitsi-meet';
+// import JitsiMeetJS from '@solyd/lib-jitsi-meet/dist/umd/lib-jitsi-meet.min.js';
+// import JitsiMeetJS from '@solyd/lib-jitsi-meet';
+// const $ = require('./jquery-3.5.1.min.js');
+// const JitsiMeetJS = require('./lib-jitsi-meet.min.js');
+import JitsiMeetJS from './lib-jitsi-meet/index.ts'
 
 export default function JitsiModule(ƒ) {
 
@@ -112,6 +117,9 @@ export default function JitsiModule(ƒ) {
   //Triggered when new local tracks created, add listeners for each track,
   //runs once at the startup, before(!) joining the room
   function onLocalTracks(tracks) {
+    console.log(tracks)
+    // tracks == JitsiTrack
+    console.log(typeof(tracks[0]))
     for (let i = 0; i < tracks.length; i++) {
       //add EventListeners:
       tracks[i].addEventListener(
@@ -205,6 +213,7 @@ export default function JitsiModule(ƒ) {
 
   //set basic listeners at start
   useEffect(() => {
+    
     isJoined.current = false
     JitsiMeetJS.init({ disableAudioLevels: true })
     JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
@@ -229,7 +238,7 @@ export default function JitsiModule(ƒ) {
   useEffect(() => {
     if (countLocalVideo) {
       console.log('HEY Local Video WHATS GOING ON?? ', countLocalVideo)
-      countLocalVideo.ref.current.srcObject = countLocalVideo.media.stream
+      countLocalVideo.media.attach(countLocalVideo.ref.current)
     }
   }, [countLocalVideo])
 
@@ -237,7 +246,7 @@ export default function JitsiModule(ƒ) {
   useEffect(() => {
     if (countLocalAudio) {
       console.log('HEY Local Audio WHATS GOING ON?? ', countLocalAudio)
-      countLocalAudio.ref.current.srcObject = countLocalAudio.media.stream
+      countLocalAudio.media.attach(countLocalAudio.ref.current)
     }
   }, [countLocalAudio])
 
@@ -248,7 +257,7 @@ export default function JitsiModule(ƒ) {
       countRemoteVideo.forEach((element) => {
         if (!element.ref.current.srcObject) {
           console.log('useEffect video found element without srcObject: ', element.ref.current)
-          element.ref.current.srcObject = element.media.stream
+          element.media.attach(element.ref.current)
         }
       })
       console.log('HEY Video WHATS GOING ON?? ', countRemoteVideo)
@@ -260,7 +269,7 @@ export default function JitsiModule(ƒ) {
     if (countRemoteAudio?.length > 0) {
       countRemoteAudio.forEach((element) => {
         console.log('useEffect audio found element without srcObject: ', element.ref.current)
-        element.ref.current.srcObject = element.media.stream
+        element.media.attach(element.ref.current)
       })
       console.log('HEY AUDIO WHATS GOING ON?? ', countRemoteAudio)
     }
@@ -311,14 +320,21 @@ export default function JitsiModule(ƒ) {
   }
 
   const handleVideoMute = async () => {
+    console.log(countLocalVideo)
+    console.log(countLocalVideo.media)
     if (isVideoMuted) {
       console.log('Video Should unmute')
-      await countLocalVideo.media.unmute()
+      const result = await countLocalVideo.media.unmute()
+      countLocalVideo.media.muted = false;
+      console.log(result)
+      
     } else {
       console.log('Video Should mute')
-      await countLocalVideo.media.mute()
+      const result = await countLocalVideo.media.mute()
+      console.log(result);
     }
     console.log('Change Video Mute - unmute ', countLocalVideo.media)
+    console.log(countLocalVideo.media.isMuted())
     setIsVideoMuted(() => !isVideoMuted)
   }
 
